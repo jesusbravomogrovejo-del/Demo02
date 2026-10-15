@@ -1,0 +1,165 @@
+﻿@model Demo02.Models.AlumnoViewModel
+@{
+    ViewData["Title"] = "Alumnos";
+}
+
+<h1 class="mb-3">Alumnos</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-header fw-semibold">
+        @(Model.EsEdicion ? "Editar alumno" : "Nuevo alumno")
+    </div>
+    <div class="card-body">
+        <form asp-action="Guardar" method="post">
+            <input type="hidden" asp-for="EsEdicion" />
+            <input type="hidden" asp-for="Alumno.AlumnoId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label asp-for="Alumno.Codigo" class="form-label">Código</label>
+                    <input asp-for="Alumno.Codigo" class="form-control" maxlength="20" />
+                    <span asp-validation-for="Alumno.Codigo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Alumno.Nombres" class="form-label">Nombres</label>
+                    <input asp-for="Alumno.Nombres" class="form-control" maxlength="50" />
+                    <span asp-validation-for="Alumno.Nombres" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-5">
+                    <label asp-for="Alumno.Apellidos" class="form-label">Apellidos</label>
+                    <input asp-for="Alumno.Apellidos" class="form-control" maxlength="50" />
+                    <span asp-validation-for="Alumno.Apellidos" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Alumno.CicloId" class="form-label">Ciclo</label>
+                    <select asp-for="Alumno.CicloId" asp-items="Model.Ciclos" class="form-select">
+                        <option value="">-- Selecciona un ciclo --</option>
+                    </select>
+                    <span asp-validation-for="Alumno.CicloId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-5">
+                    <label asp-for="Alumno.CursoId" class="form-label">Curso</label>
+                    <select asp-for="Alumno.CursoId" asp-items="Model.Cursos" class="form-select">
+                        <option value="">-- Selecciona un curso --</option>
+                    </select>
+                    <span asp-validation-for="Alumno.CursoId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="Alumno.Beca" class="form-label">Beca</label>
+                    <input asp-for="Alumno.Beca" type="number" step="0.01" min="0"
+                           asp-format="{0:0.00}" class="form-control" />
+                    <span asp-validation-for="Alumno.Beca" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="Alumno.Fecha" class="form-label">Fecha</label>
+                    <input asp-for="Alumno.Fecha" type="date" asp-format="{0:yyyy-MM-dd}" class="form-control" />
+                    <span asp-validation-for="Alumno.Fecha" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check form-switch">
+                        <input asp-for="Alumno.Activo" class="form-check-input" />
+                        <label asp-for="Alumno.Activo" class="form-check-label">Activo</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    @(Model.EsEdicion ? "Guardar cambios" : "Registrar alumno")
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    @(Model.EsEdicion ? "Cancelar" : "Limpiar")
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Ciclo</th>
+                <th>Curso</th>
+                <th class="text-end">Beca</th>
+                <th>Fecha</th>
+                <th>Activo</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Lista.Any())
+            {
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-4">
+                        Todavía no hay alumnos. Registra el primero con el formulario de arriba.
+                    </td>
+                </tr>
+            }
+
+            @foreach (var a in Model.Lista)
+            {
+                <tr>
+                    <td>@a.Codigo</td>
+                    <td>@a.Nombres</td>
+                    <td>@a.Apellidos</td>
+                    <td>@a.Ciclo?.Nombre</td>
+                    <td>@a.Curso?.Nombre</td>
+                    <td class="text-end">@a.Beca?.ToString("N2")</td>
+                    <td>@a.Fecha?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (a.Activo == true)
+                        {
+                            <span class="badge bg-success">Sí</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a asp-action="Index" asp-route-id="@a.AlumnoId"
+                           class="btn btn-sm btn-outline-primary">Editar</a>
+
+                        <form asp-action="Eliminar" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar al alumno @a.Codigo?');">
+                            <input type="hidden" name="id" value="@a.AlumnoId" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
